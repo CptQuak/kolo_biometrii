@@ -3,27 +3,41 @@ import numpy as np
 
 
 def img_to_bytes(img):
+    '''
+    img to bytes for viewing
+    '''
     img_encode = cv2.imencode('.png', img)[1]
     data = img_encode.tobytes()
-
     return data
 
+
 def grayscale(img):
+    '''
+    rgb2gray using simple mean
+    '''
     h, w = img.shape[:2]
     out = np.zeros((h,w))
 
     for i in range(h):
         for j in range(w):
             out[i, j] = img[i,j,:].mean()
+    
     return out
 
+
 def binarize(img, threshold=127):
-    h, w = img.shape[:2]
-    out = np.zeros_like(img)
+    '''
+    binarization
+    '''
+    gray = grayscale(img)
+    h, w = gray.shape[:2]
+    out = np.zeros_like(gray)
+
     for i in range(h):
         for j in range(w):
-            out[i, j] = 0 if img[i,j,:].mean() < threshold else 255
+            out[i, j] = 0 if gray[i,j] < threshold else 255
     return out
+
 
 def niblack(img, n):
     '''binaryzacja niblacka
@@ -40,3 +54,5 @@ def niblack(img, n):
             out[i, j] = 0 if gray[i, j] < T else 255
     
     return out
+
+
