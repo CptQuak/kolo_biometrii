@@ -17,14 +17,19 @@ bin_button = sg.Button('Process', key="Process")
 # algorithm selection
 algorithms = ['Gray', 'Thresholding', 'Niblack']
 combobox = sg.Combo(algorithms, default_value=algorithms[0], key='Combo')
-# thresholding value if algorithm uses it
-slider = sg.Slider(default_value=127, range=(0,255), orientation="horizontal", key='Slider')
+
+# thresholding value for thresholding alg
+slider1 = sg.Slider(default_value=127, range=(0,255), orientation="horizontal", key='Slider1')
+# k value for niblack algo
+slider2 = sg.Slider(default_value=0.2, range=(0,1), orientation="horizontal", key='Slider2', resolution=0.1)
+# n value for niblack algo
+slider3 = sg.Slider(default_value=1, range=(1,10), orientation="horizontal", key='Slider3')
 # określenie układu kontrolek
 layout = [
     [file_browse1], # pierwszy rząd
     [img_box1, img_box2], # drugi rząd
     [bin_button, combobox],
-    [slider], 
+    [slider1, slider2, slider3], 
 ]
 # nowe okno: nazwa okna, układ kontrolek
 window = sg.Window("Simple Gui App", layout)
@@ -33,11 +38,11 @@ window = sg.Window("Simple Gui App", layout)
 while True:
     # current event and slider value
     event, values = window.read() 
-    slider_val = values['Slider'] 
     
     # event processing
     if event is None:
         break 
+    
     # choosing file
     elif event == 'Browse1':
         filename = values['Browse1']
@@ -45,15 +50,20 @@ while True:
         img = cv2.resize(img, (250, 250), interpolation=cv2.INTER_AREA)
         data = utils.img_to_bytes(img)
         img_box1.update(data = data) 
+    
     # processing algorithm based on currently set option
     elif event == 'Process':
         if values['Combo'] == algorithms[0]:
             img_processed = utils.grayscale(img)
         elif values['Combo'] == algorithms[1]:
-            img_processed = utils.binarize(img, slider_val)
+            T = values['Slider1'] 
+            img_processed = utils.binarize(img, T)
         elif values['Combo'] == algorithms[2]:
-            img_processed = utils.niblack(img, 1)
-        data = utils.img_to_bytes(img)
+            k = values['Slider2'] 
+            n = values['Slider3'] 
+            img_processed = utils.niblack(img, n, k)
+            
+        data = utils.img_to_bytes(img_processed)
         img_box2.update(data = data)
 
 window.close()

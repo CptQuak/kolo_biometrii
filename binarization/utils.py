@@ -36,21 +36,29 @@ def binarize(img, threshold=127):
     for i in range(h):
         for j in range(w):
             out[i, j] = 0 if gray[i,j] < threshold else 255
+            
     return out
 
 
-def niblack(img, n):
+def niblack(img, n, k):
     '''binaryzacja niblacka
     n = kernel size defined by the number of neighbours
     1 -> 3x3, 2 -> 5x5'''
-    gray = grayscale(img)
-    h, w = gray.shape[:2]
-    out = np.zeros_like(gray)
+    n = int(n)
+    h, w = img.shape[:2]
+    # original grayscale
+    gray_temp = grayscale(img)
+    # grayscale with a n size border of black pixels 
+    gray = np.zeros((h+2*n, w+2*n))
+    gray[n:-n, n:-n] = gray_temp
+    out = np.zeros_like(gray_temp)
 
     for i in range(n, h-n):
         for j in range(n, w-n):
+            # current kernel
             roi = gray[i-n:i+n+1, j-n:j+n+1]
-            T = roi.mean() - -0.2 * roi.std()
+            # thresholding for this kernel
+            T = roi.mean() -k*roi.std()
             out[i, j] = 0 if gray[i, j] < T else 255
     
     return out
