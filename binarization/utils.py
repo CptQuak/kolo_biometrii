@@ -101,9 +101,9 @@ def rid_calvard(img):
     t_bg4 = gray[-cor_size:, -cor_size:] # DR
     t_bg = np.concatenate([t_bg1, t_bg2, t_bg3, t_bg4])
     # threshold foreground
-    t_fg1 = gray[:cor_size,  cor_size:-cor_size] # UP
-    t_fg2 = gray[-cor_size:, cor_size:-cor_size] # DOWN
-    t_fg3 = gray[cor_size:-cor_size,:] # Middle
+    t_fg1 = gray[:cor_size,  cor_size:-cor_size]    # UP
+    t_fg2 = gray[-cor_size:, cor_size:-cor_size]    # DOWN
+    t_fg3 = gray[cor_size:-cor_size,:]              # Middle
     t_fg = np.concatenate([t_fg1.flatten(), t_fg2.flatten(), t_fg3.flatten()])
     # threshold value
     threshold_zero = (t_bg.mean() + t_fg.mean())/2
