@@ -4,7 +4,7 @@ import PySimpleGUI as sg
 import utils
 
 # initial image
-img = np.zeros((250, 250, 3), 'uint8')
+img = np.zeros((400, 400, 3), 'uint8')
 data = utils.img_to_bytes(img) 
 # gui composition
 # load image button
@@ -15,7 +15,7 @@ img_box2 = sg.Image(data=data, key="Image2")
 # button to process image
 bin_button = sg.Button('Process', key="Process")
 # algorithm selection
-algorithms = ['Gray', 'Thresholding', 'Niblack']
+algorithms = ['Gray', 'Thresholding', 'Niblack', 'Sauvola']
 combobox = sg.Combo(algorithms, default_value=algorithms[0], key='Combo')
 
 # thresholding value for thresholding alg
@@ -24,12 +24,15 @@ slider1 = sg.Slider(default_value=127, range=(0,255), orientation="horizontal", 
 slider2 = sg.Slider(default_value=0.2, range=(0,1), orientation="horizontal", key='Slider2', resolution=0.1)
 # n value for niblack algo
 slider3 = sg.Slider(default_value=1, range=(1,10), orientation="horizontal", key='Slider3')
+# r for sauvola
+slider4 = sg.Slider(default_value=127, range=(0,255), orientation="horizontal", key='Slider4')
 # określenie układu kontrolek
 layout = [
     [file_browse1], # pierwszy rząd
     [img_box1, img_box2], # drugi rząd
     [bin_button, combobox],
-    [slider1, slider2, slider3], 
+    [sg.Text("Threshold: "), slider1, sg.Text("K param: "),slider2,],
+    [sg.Text("Neighbors: "), slider3, sg.Text("K param: "), slider4] 
 ]
 # nowe okno: nazwa okna, układ kontrolek
 window = sg.Window("Simple Gui App", layout)
@@ -47,7 +50,7 @@ while True:
     elif event == 'Browse1':
         filename = values['Browse1']
         img = cv2.imread(filename)
-        img = cv2.resize(img, (250, 250), interpolation=cv2.INTER_AREA)
+        img = cv2.resize(img, (400, 400), interpolation=cv2.INTER_AREA)
         data = utils.img_to_bytes(img)
         img_box1.update(data = data) 
     
@@ -62,7 +65,12 @@ while True:
             k = values['Slider2'] 
             n = values['Slider3'] 
             img_processed = utils.niblack(img, n, k)
-            
+        elif values['Combo'] == algorithms[3]:
+            k = values['Slider2'] 
+            n = values['Slider3'] 
+            r = values['Slider4'] 
+            img_processed = utils.sauvola(img, n, k, r)
+
         data = utils.img_to_bytes(img_processed)
         img_box2.update(data = data)
 
