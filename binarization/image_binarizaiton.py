@@ -14,8 +14,9 @@ img_box1 = sg.Image(data=data, key="Image1")
 img_box2 = sg.Image(data=data, key="Image2") 
 # button to process image
 bin_button = sg.Button('Process', key="Process")
+
 # algorithm selection
-algorithms = ['Gray', 'Thresholding', 'Niblack', 'Sauvola']
+algorithms = ['Gray', 'Thresholding', 'Niblack', 'Sauvola', 'Rid_Calvard']
 combobox = sg.Combo(algorithms, default_value=algorithms[0], key='Combo')
 
 # thresholding value for thresholding alg
@@ -32,7 +33,7 @@ layout = [
     [img_box1, img_box2], # drugi rząd
     [bin_button, combobox],
     [sg.Text("Threshold: "), slider1, sg.Text("K param: "),slider2,],
-    [sg.Text("Neighbors: "), slider3, sg.Text("K param: "), slider4] 
+    [sg.Text("Neighbors: "), slider3, sg.Text("R param: "), slider4] 
 ]
 # nowe okno: nazwa okna, układ kontrolek
 window = sg.Window("Simple Gui App", layout)
@@ -70,6 +71,8 @@ while True:
             n = values['Slider3'] 
             r = values['Slider4'] 
             img_processed = utils.sauvola(img, n, k, r)
+        elif values['Combo'] == algorithms[4]:
+            img_processed = utils.rid_calvard(img)
 
         data = utils.img_to_bytes(img_processed)
         img_box2.update(data = data)

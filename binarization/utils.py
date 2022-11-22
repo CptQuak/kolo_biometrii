@@ -84,4 +84,22 @@ def sauvola(img, n, k, r):
     return out
 
 
-    return out
+def rid_calvard(img):
+    h, w = img.shape[:2]
+    # original grayscale
+    gray = grayscale(img)
+
+    cor_size = 150
+
+    # i0
+    # t_bg = mean z 4 cornerow
+    # t_fg = mean z reszty
+    t_bg1 = gray[:cor_size, :cor_size]
+    t_bg2 = gray[:cor_size:, -cor_size:]
+    t_bg3 = gray[-cor_size:, :cor_size]
+    t_bg4 = gray[-cor_size:, -cor_size:]
+    #t_bg = gray[0]
+    # TO NIE POKAZUJE BO OPENCV FORMAT
+    cv2.imshow('A1',t_bg1)
+    cv2.waitKey(0)
+    # i1
