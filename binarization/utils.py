@@ -15,13 +15,8 @@ def grayscale(img):
     '''
     rgb2gray using simple mean
     '''
-    h, w = img.shape[:2]
-    out = np.zeros((h,w))
-
-    for i in range(h):
-        for j in range(w):
-            out[i, j] = img[i,j,:].mean()
-    
+    out = img.mean(axis=2)
+    out = out.astype('uint8')
     return out
 
 
@@ -30,14 +25,10 @@ def binarize(img, threshold=127):
     binarization
     '''
     gray = grayscale(img)
-    h, w = gray.shape[:2]
-    out = np.zeros_like(gray)
+    gray[gray>=threshold] = 255
+    gray[gray<threshold] = 0
 
-    for i in range(h):
-        for j in range(w):
-            out[i, j] = 0 if gray[i,j] < threshold else 255
-            
-    return out
+    return gray
 
 
 def niblack(img, n, k):
@@ -63,7 +54,14 @@ def niblack(img, n, k):
     
     return out
 
+
+
+
+
 def sauvola(img, n, k, r):
+    '''
+    img, n - size of kernel, k - strength of thresholding, R - scaling
+    '''
     n = int(n)
     h, w = img.shape[:2]
     # original grayscale
@@ -85,21 +83,47 @@ def sauvola(img, n, k, r):
 
 
 def rid_calvard(img):
-    h, w = img.shape[:2]
+    '''
+    Automaticaly finds thresholding value by assuming corner of image as image background
+    Then iteratively computes new threshold by comparing means of regions where thresholding is applied
+    '''
     # original grayscale
     gray = grayscale(img)
+    out = np.zeros_like(gray)
 
+    # corner size
     cor_size = 150
+    ## Initial thresholding value calculation
+    # threshold bg = 4 corners
+    t_bg1 = gray[:cor_size, :cor_size]   # UL
+    t_bg2 = gray[:cor_size:, -cor_size:] # UR
+    t_bg3 = gray[-cor_size:, :cor_size]  # DL
+    t_bg4 = gray[-cor_size:, -cor_size:] # DR
+    t_bg = np.concatenate([t_bg1, t_bg2, t_bg3, t_bg4])
+    # threshold foreground
+    t_fg1 = gray[:cor_size,  cor_size:-cor_size] # UP
+    t_fg2 = gray[-cor_size:, cor_size:-cor_size] # DOWN
+    t_fg3 = gray[cor_size:-cor_size,:] # Middle
+    t_fg = np.concatenate([t_fg1.flatten(), t_fg2.flatten(), t_fg3.flatten()])
+    # threshold value
+    threshold_zero = (t_bg.mean() + t_fg.mean())/2
 
-    # i0
-    # t_bg = mean z 4 cornerow
-    # t_fg = mean z reszty
-    t_bg1 = gray[:cor_size, :cor_size]
-    t_bg2 = gray[:cor_size:, -cor_size:]
-    t_bg3 = gray[-cor_size:, :cor_size]
-    t_bg4 = gray[-cor_size:, -cor_size:]
-    #t_bg = gray[0]
-    # TO NIE POKAZUJE BO OPENCV FORMAT
-    cv2.imshow('A1',t_bg1)
-    cv2.waitKey(0)
-    # i1
+    # generating new thresholding value
+    while True:
+        # pixels above threshold
+        t1_above = gray[gray >= threshold_zero]
+        # pixels below threshold
+        t1_below = gray[gray < threshold_zero]
+        # new threshold
+        threshold_one = (t1_above.mean() + t1_below.mean())/2
+
+        # while threshold changes update, else break
+        if threshold_one != threshold_zero:
+            threshold_zero = threshold_one
+        else:
+            break
+    
+    out[gray>=threshold_zero] = 255
+    out[gray<threshold_zero] = 0
+            
+    return out
