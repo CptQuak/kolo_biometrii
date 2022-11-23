@@ -16,7 +16,7 @@ img_box2 = sg.Image(data=data, key="Image2")
 bin_button = sg.Button('Process', key="Process")
 
 # algorithm selection
-algorithms = ['Gray', 'Thresholding', 'Niblack', 'Sauvola', 'Rid_Calvard']
+algorithms = ['Gray', 'Thresholding', 'Niblack', 'Sauvola', 'Rid_Calvard', 'Otsu']
 combobox = sg.Combo(algorithms, default_value=algorithms[0], key='Combo')
 
 # thresholding value for thresholding alg
@@ -73,6 +73,8 @@ while True:
             img_processed = utils.sauvola(img, n, k, r)
         elif values['Combo'] == algorithms[4]:
             img_processed = utils.rid_calvard(img)
+        elif values['Combo'] == algorithms[5]:
+            img_processed = utils.otsu(img)
 
         data = utils.img_to_bytes(img_processed)
         img_box2.update(data = data)

@@ -127,3 +127,45 @@ def rid_calvard(img):
     out[gray<threshold_zero] = 0
             
     return out
+
+import matplotlib.pyplot as plt
+
+def otsu(img):
+    # original grayscale
+    gray = grayscale(img)
+    
+    war_within = np.zeros(gray.max())
+
+    for t in range(0, war_within.shape[0]):
+        out = np.zeros_like(gray)
+        out[gray > t] = 1
+
+        # compute weights
+        weight_total = out.size
+        non_zero_pixels = out[out == 1].size
+        weight_fg = non_zero_pixels/weight_total
+        weight_bg = 1-weight_fg
+        
+        # if all one color then next
+        if weight_fg == 0 or weight_bg ==0:
+            war_within[t] = np.inf
+
+        # pixele danej klasyna oryginale
+        val_pixels_fg = gray[out == 1]
+        val_pixels_bg = gray[out == 0]
+
+        # variance
+        var_fg = np.var(val_pixels_fg) if len(val_pixels_fg) > 0 else 0 
+        var_bg = np.var(val_pixels_bg) if len(val_pixels_bg) > 0 else 0 
+
+        # score
+        war_within[t] = weight_fg*var_fg + weight_bg*var_bg
+
+    # selection of best
+    best_th = np.argmin(war_within)    
+    return binarize(img, best_th)
+
+if __name__ == '__main__':
+    np.random.seed(10)
+    img = np.random.randint(0, 255, (50, 50, 3))
+    otsu(img)
