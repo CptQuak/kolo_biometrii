@@ -14,6 +14,7 @@ img_box1 = sg.Image(data=data, key="Image1")
 img_box2 = sg.Image(data=data, key="Image2") 
 # button to process image
 bin_button = sg.Button('Process', key="Process")
+save_button = sg.Button('Save', key="Save")
 
 # algorithm selection
 algorithms = ['Gray', 'Thresholding', 'Niblack', 'Sauvola', 'Rid_Calvard', 'Otsu']
@@ -31,7 +32,7 @@ slider4 = sg.Slider(default_value=127, range=(0,255), orientation="horizontal", 
 layout = [
     [file_browse1], # pierwszy rząd
     [img_box1, img_box2], # drugi rząd
-    [bin_button, combobox],
+    [bin_button, combobox, save_button],
     [sg.Text("Threshold: "), slider1, sg.Text("K param: "),slider2,],
     [sg.Text("Neighbors: "), slider3, sg.Text("R param: "), slider4] 
 ]
@@ -54,7 +55,7 @@ while True:
         img = cv2.resize(img, (400, 400), interpolation=cv2.INTER_AREA)
         data = utils.img_to_bytes(img)
         img_box1.update(data = data) 
-    
+
     # processing algorithm based on currently set option
     elif event == 'Process':
         if values['Combo'] == algorithms[0]:
@@ -78,6 +79,9 @@ while True:
 
         data = utils.img_to_bytes(img_processed)
         img_box2.update(data = data)
+    elif event == 'Save':
+        cv2.imwrite('binarization/thImg.jpg', img_processed)
+        
 
 window.close()
 
