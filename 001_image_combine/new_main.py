@@ -22,8 +22,8 @@ slider = sg.Slider(
     default_value=0, range=(0,100), orientation="horizontal", 
     key='Slider', enable_events=True)
 # kontrolka wyświetlająca obrazek
-img1 = Image.open('dog.png').resize((250, 250))
-img2 = Image.open('beach.png').resize((250, 250))
+img1 = Image.open('000_images/dog.png').resize((250, 250))
+img2 = Image.open('000_images/beach.png').resize((250, 250))
 proc_img = utils.nakladanie(img1, img2, 0.35) # początkowa wartość zwracana przez funkcję => szary
 data = utils.img_to_bytes(proc_img)
 img_box = sg.Image(data=data, key="Image")
@@ -50,8 +50,12 @@ while True:
     elif event == 'Browse1': # jeśli wybrano obrazek 1
         filename = values['Browse1'] # pobierz aktualnie wybraną ścieżkę do obrazka
         img1 = Image.open(filename).resize((250, 250))
+        print('1',values['Browse1'])
+        print('2',values['Browse2'])
     elif event == 'Browse2': # jeśli wybrano obrazek 2
         filename = values['Browse2'] # pobierz aktualnie wybraną ścieżkę do obrazka
         img2 = Image.open(filename).resize((250, 250))
+        print('1',values['Browse1'])
+        print('2',values['Browse2'])
 
 window.close() # zamknij okno

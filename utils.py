@@ -14,14 +14,6 @@ def img_to_bytes(img):
     return img_byte_arr.getvalue()
 
 
-def nakladanie(img1, img2, rescale):
-    # funkcja w opencv
-    # img = cv2.addWeighted(img1, rescale, img2, 1-rescale, 0)
-    img1 = np.array(img1)
-    img2 = np.array(img2)
-    img = np.zeros(img1.shape, dtype='float16')
-    img = (img1*rescale + img2*(1-rescale)).astype('uint8')
-    return img
 
 
 def grayscale(img):
@@ -41,6 +33,16 @@ def load_image(file_path, target, im_size):
     data = img_to_bytes(img)
     target.update(data = data)
     return img
+
+def nakladanie(img1, img2, rescale):
+    # funkcja w opencv
+    # img = cv2.addWeighted(img1, rescale, img2, 1-rescale, 0)
+    img1 = np.array(img1)
+    img2 = np.array(img2)
+    img = np.zeros(img1.shape, dtype='float16')
+    img = (img1*rescale + img2*(1-rescale)).astype('uint8')
+    return img
+
 
 
 def binarize(img, threshold=127):
