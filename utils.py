@@ -1,14 +1,25 @@
 import cv2
 import numpy as np
-
+import PIL
+from PIL import Image
+import io
 
 def img_to_bytes(img):
     '''
     img to bytes for viewing
     '''
-    img_encode = cv2.imencode('.png', img)[1]
-    data = img_encode.tobytes()
-    return data
+    pil_img = Image.fromarray()
+    img_byte_arr = io.BytesIO()
+    pil_img.save(img_byte_arr, format='PNG')
+    return img_byte_arr.getvalue()
+
+
+def nakladanie(img1, img2, rescale):
+    # funkcja w opencv
+    # img = cv2.addWeighted(img1, rescale, img2, 1-rescale, 0)
+    img = np.zeros(img1.shape, dtype='float16')
+    img = (img1*rescale + img2*(1-rescale)).astype('uint8')
+    return img
 
 
 def grayscale(img):

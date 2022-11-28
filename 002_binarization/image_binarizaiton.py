@@ -1,6 +1,12 @@
 import cv2
 import numpy as np
 import PySimpleGUI as sg
+# file path to utility file
+import sys
+import os
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
 import utils
 
 # initial image

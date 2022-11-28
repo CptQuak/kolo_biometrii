@@ -1,23 +1,10 @@
+import sys
+sys.path
+
+
 import cv2
 import numpy as np
 import PySimpleGUI as sg
-
-
-def nakladanie(img, img1, img2, rescale):
-    # funkcja w opencv
-    # img = cv2.addWeighted(img1, rescale, img2, 1-rescale, 0)
-
-    # działania na macierzach w numpy; 
-    # ponieważ img1 i img2 maja dtype int8, ich suma capuje sie na wartosci 255; 
-    # nie musimy sie rowniez martwic wartosciami po przecinku, ale tak dla pewnosci
-    img = (img1*rescale + img2*(1-rescale)).astype('uint8')
-
-    # np array2png img; [0] - boolean suc/fail [1] - img
-    img_encode = cv2.imencode('.png', img)[1]
-    bytes_encode = img_encode.tobytes()
-
-    return bytes_encode
-
 
 
 # deklaracja tymczasowych obrazków
@@ -41,7 +28,7 @@ slider = sg.Slider(
     default_value=0, range=(0,100), orientation="horizontal", 
     key='Slider', enable_events=True)
 # kontrolka wyświetlająca obrazek
-data = nakladanie(img, img1, img2, 0.35) # początkowa wartość zwracana przez funkcję => biały obrazek
+data = utils.nakladanie(img, img1, img2, 0.35) # początkowa wartość zwracana przez funkcję => biały obrazek
 img_box = sg.Image(data=data, key="Image") # przypisanie obrazka do kontrolki
 
 # określenie układu kontrolek
@@ -60,7 +47,7 @@ while True:
         break # wyjdź z pętli
     elif event == 'Slider': # jeśli zmieniła się wartość suwaka
         slider_val = values['Slider'] # pobierz aktualną wartość ratio
-        data = nakladanie(img, img1, img2, slider_val/100) # aktualizuj obrazek
+        data = utils.nakladanie(img, img1, img2, slider_val/100) # aktualizuj obrazek
         img_box.update(data = data) # ustaw aktualny obrazek
     elif event == 'Browse1': # jeśli wybrano obrazek 1
         filename = values['Browse1'] # pobierz aktualnie wybraną ścieżkę do obrazka
