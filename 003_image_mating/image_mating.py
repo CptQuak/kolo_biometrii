@@ -19,7 +19,7 @@ file_browse1 = sg.FileBrowse("Mainimage", key="Browse1", enable_events=True)
 file_browse2 = sg.FileBrowse("Background", key="Browse2", enable_events=True)
 file_browse3 = sg.FileBrowse("Thresholded", key="Browse3", enable_events=True)
 # image viewing fields
-img_boxes = [sg.Image(data=data, key=f"Image{i}") for i in range(4)]
+img_boxes = [sg.Image(data=data, key=f"Image{i}") for i in range(1, 5)]
 # button to process image
 bin_button = sg.Button('Process', key="Process")
 
@@ -41,13 +41,13 @@ while True:
     # tu jest jakis dziwny bug z labelami kolejnych przyciskow XD
     elif event == 'Browse1':
         filename = values['Browse1']
-        bg_img = utils.load_image(filename, img_boxes[1], im_size=im_size)
+        bg_img = utils.load_image(filename, img_boxes[0], im_size=im_size)
     elif event == 'Browse2':
         filename = values['Browse2']
-        th_img = utils.load_image(filename, img_boxes[2], im_size=im_size)
+        th_img = utils.load_image(filename, img_boxes[1], im_size=im_size)
     elif event == 'Browse3':
         filename = values['Browse3']
-        main_img = utils.load_image(filename, img_boxes[0], im_size=im_size)
+        main_img = utils.load_image(filename, img_boxes[2], im_size=im_size)
 
     
     # processing algorithm based on currently set option

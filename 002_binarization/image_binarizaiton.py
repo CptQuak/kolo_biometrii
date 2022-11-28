@@ -1,6 +1,7 @@
-import cv2
 import numpy as np
 import PySimpleGUI as sg
+import PIL
+from PIL import Image
 # file path to utility file
 import sys
 import os
@@ -11,16 +12,14 @@ import utils
 
 # initial image
 img = np.zeros((400, 400, 3), 'uint8')
+img = Image.open('000_images/book_page.jpg').resize((400, 400))
+
 data = utils.img_to_bytes(img) 
 # gui composition
 # load image button
 file_browse1 = sg.FileBrowse("Choose file 1", key="Browse1", enable_events=True)
 # image viewing fields
-img_box1 = sg.Image(data=data, key="Image1") 
-img_box2 = sg.Image(data=data, key="Image2") 
-# button to process image
-bin_button = sg.Button('Process', key="Process")
-save_button = sg.Button('Save', key="Save")
+img_boxes = [sg.Image(data=data, key=f"Image{i}") for i in range(1, 3)]
 
 # algorithm selection
 algorithms = ['Gray', 'Thresholding', 'Niblack', 'Sauvola', 'Rid_Calvard', 'Otsu']
@@ -37,8 +36,8 @@ slider4 = sg.Slider(default_value=127, range=(0,255), orientation="horizontal", 
 # określenie układu kontrolek
 layout = [
     [file_browse1], # pierwszy rząd
-    [img_box1, img_box2], # drugi rząd
-    [bin_button, combobox, save_button],
+    img_boxes, # drugi rząd
+    [sg.Button('Process', key="Process"), combobox, sg.Button('Save', key="Save")],
     [sg.Text("Threshold: "), slider1, sg.Text("K param: "),slider2,],
     [sg.Text("Neighbors: "), slider3, sg.Text("R param: "), slider4] 
 ]
@@ -47,21 +46,14 @@ window = sg.Window("Simple Gui App", layout)
 
 # gui loop
 while True:
-    # current event and slider value
     event, values = window.read() 
-    
     # event processing
     if event is None:
         break 
-    
     # choosing file
     elif event == 'Browse1':
         filename = values['Browse1']
-        img = cv2.imread(filename)
-        img = cv2.resize(img, (400, 400), interpolation=cv2.INTER_AREA)
-        data = utils.img_to_bytes(img)
-        img_box1.update(data = data) 
-
+        utils.load_image(filename, img_boxes[0], 400)
     # processing algorithm based on currently set option
     elif event == 'Process':
         if values['Combo'] == algorithms[0]:
@@ -82,12 +74,12 @@ while True:
             img_processed = utils.rid_calvard(img)
         elif values['Combo'] == algorithms[5]:
             img_processed = utils.otsu(img)
-
+        # update image field
         data = utils.img_to_bytes(img_processed)
-        img_box2.update(data = data)
+        img_boxes[1].update(data = data)
     elif event == 'Save':
-        cv2.imwrite('binarization/thImg.jpg', img_processed)
-        
+        img_save = Image.fromarray(img_processed)
+        img_save.save('000_images/thresholded.jpg')
 
 window.close()
 

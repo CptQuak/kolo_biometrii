@@ -1,4 +1,3 @@
-import cv2
 import numpy as np
 import PIL
 from PIL import Image
@@ -8,15 +7,18 @@ def img_to_bytes(img):
     '''
     img to bytes for viewing
     '''
-    pil_img = Image.fromarray()
+    if isinstance(img, np.ndarray):
+        img = Image.fromarray(img)
     img_byte_arr = io.BytesIO()
-    pil_img.save(img_byte_arr, format='PNG')
+    img.save(img_byte_arr, format='PNG')
     return img_byte_arr.getvalue()
 
 
 def nakladanie(img1, img2, rescale):
     # funkcja w opencv
     # img = cv2.addWeighted(img1, rescale, img2, 1-rescale, 0)
+    img1 = np.array(img1)
+    img2 = np.array(img2)
     img = np.zeros(img1.shape, dtype='float16')
     img = (img1*rescale + img2*(1-rescale)).astype('uint8')
     return img
@@ -26,34 +28,26 @@ def grayscale(img):
     '''
     rgb2gray using simple mean
     '''
+    img = np.array(img)
     out = img.mean(axis=2)
     out = out.astype('uint8')
     return out
 
-def load_image(filename, target, im_size):
+def load_image(file_path, target, im_size):
     '''
     Given img path, img window, reads, resizes, transforms to bytes and displays window
     '''
-    img = cv2.imread(filename)
-    img = cv2.resize(img, (im_size, im_size), interpolation=cv2.INTER_AREA)
+    img = Image.open(file_path).resize((im_size, im_size))
     data = img_to_bytes(img)
     target.update(data = data)
     return img
-
-
-
-
-
-
-
-
-
 
 
 def binarize(img, threshold=127):
     '''
     binarization
     '''
+    img = np.array(img)
     gray = grayscale(img)
     gray[gray>=threshold] = 255
     gray[gray<threshold] = 0
@@ -65,6 +59,7 @@ def niblack(img, n, k):
     '''binaryzacja niblacka
     n = kernel size defined by the number of neighbours
     1 -> 3x3, 2 -> 5x5'''
+    img = np.array(img)
     n = int(n)
     h, w = img.shape[:2]
     # original grayscale
@@ -85,13 +80,11 @@ def niblack(img, n, k):
     return out
 
 
-
-
-
 def sauvola(img, n, k, r):
     '''
     img, n - size of kernel, k - strength of thresholding, R - scaling
     '''
+    img = np.array(img)
     n = int(n)
     h, w = img.shape[:2]
     # original grayscale
@@ -118,6 +111,7 @@ def rid_calvard(img):
     Then iteratively computes new threshold by comparing means of regions where thresholding is applied
     '''
     # original grayscale
+    img = np.array(img)
     gray = grayscale(img)
     out = np.zeros_like(gray)
 
@@ -158,10 +152,10 @@ def rid_calvard(img):
             
     return out
 
-import matplotlib.pyplot as plt
 
 def otsu(img):
     # original grayscale
+    img = np.array(img)
     gray = grayscale(img)
     
     war_within = np.zeros(gray.max())
@@ -187,7 +181,6 @@ def otsu(img):
         # variance
         var_fg = np.var(val_pixels_fg) if len(val_pixels_fg) > 0 else 0 
         var_bg = np.var(val_pixels_bg) if len(val_pixels_bg) > 0 else 0 
-
         # score
         war_within[t] = weight_fg*var_fg + weight_bg*var_bg
 
