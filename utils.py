@@ -1,6 +1,6 @@
 import numpy as np
 import PIL
-from PIL import Image
+from PIL import Image, ImageFilter
 import io
 
 def img_to_bytes(img):
@@ -189,6 +189,32 @@ def otsu(img):
     # selection of best
     best_th = np.argmin(war_within)    
     return binarize(img, best_th)
+
+
+def combine_img_mask(img, mask):
+    if isinstance(img, np.ndarray):
+        img = Image.fromarray(img)
+    if isinstance(mask, np.ndarray):
+        mask = Image.fromarray(mask)
+    black = Image.fromarray(np.zeros_like(img, 'uint8'))
+    return Image.composite(img, black, mask)
+
+def erode(cycles, img):
+    if isinstance(img, np.ndarray):
+        img = Image.fromarray(img)
+    for _ in range(cycles):
+        img = img.filter(ImageFilter.MinFilter(3))
+    return img
+
+
+def dilate(cycles, img):
+    if isinstance(img, np.ndarray):
+        img = Image.fromarray(img)
+    for _ in range(cycles):
+         img = img.filter(ImageFilter.MaxFilter(3))
+    return img
+
+
 
 if __name__ == '__main__':
     np.random.seed(10)
