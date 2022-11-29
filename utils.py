@@ -231,7 +231,7 @@ def convolution(img, kernel):
     for i in range(n_neigh,rows-n_neigh):
         for j in range(n_neigh, cols-n_neigh):
             # convolution in ROI, sum of matched pixels multiplications
-            pixel_val = np.einsum('ij, ji',
+            pixel_val = np.einsum('ij, ij ->',
                                     img_extnd[i-n_neigh:i+n_neigh+1, j-n_neigh:j+n_neigh+1],
                                     kernel)
             # fixing potential overflow
@@ -239,6 +239,13 @@ def convolution(img, kernel):
 
             out[i-n_neigh, j-n_neigh] = pixel_val
     return out
+
+
+def gaussianKernel(kernel_size, sigma=1.):
+    ax = np.linspace(-(kernel_size-1)/2., (kernel_size-1)/2., kernel_size)
+    gauss = np.exp(-0.5*ax**2/np.sqrt(sigma))
+    kernel = np.outer(gauss, gauss)
+    return kernel/np.sum(kernel)
 
 
 if __name__ == '__main__':
