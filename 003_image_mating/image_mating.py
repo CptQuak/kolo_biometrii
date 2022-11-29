@@ -22,9 +22,11 @@ images_l.append(np.zeros((im_size, im_size, 3), 'uint8'))
 img_boxes = [sg.Image(data=utils.img_to_bytes(images_l[i-1]) , key=f"Image{i}") for i in range(1, 5)]
 
 slider = sg.Slider(default_value=0, range=(0,30), orientation="horizontal", key='Slider')
+buttons = [sg.Button(i, key=i) for i in ['Dilate', 'Erode', 'Blur']]
 
 layout = [
-    [sg.Button('Process', key="Process"), slider],
+    buttons,
+    [slider],
     img_boxes, # images
 ]
 # nowe okno: nazwa okna, układ kontrolek
@@ -39,18 +41,34 @@ while True:
     if event is None:
         break 
     # processing algorithm based on currently set option
-    elif event == 'Process':
+    else:
+        slider_val = int(values['Slider'])
         fg_img = np.array(images_l[0])
-        th_img = np.array(images_l[2])
-        times = int(values['Slider'])
-        th_img = utils.dilate(times, th_img)
-        # th_img = utils.erode(times, th_img)
-        new_img = utils.combine_img_mask(fg_img, th_img)
 
-        data = utils.img_to_bytes(th_img)
-        img_boxes[2].update(data)
+        if event in ['Dilate', 'Erode']:
+            th_img = np.array(images_l[2])
+            if event == 'Dilate':
+                th_img = utils.dilate(slider_val, th_img)
+            else:
+                th_img = utils.erode(slider_val, th_img)
+
+            new_img = utils.combine_img_mask(fg_img, th_img)
+
+            data = utils.img_to_bytes(th_img)
+            img_boxes[2].update(data)
+        
+        elif event == 'Blur':
+            # making sure the kernel shape is odd
+            n_neigh = slider_val+1 if slider_val % 2==0 else slider_val
+            # standard kernel
+            kernel = np.ones((n_neigh, n_neigh))/n_neigh**2
+            # convolution
+            new_img = utils.convolution(fg_img, kernel)
+
         data = utils.img_to_bytes(new_img)
         img_boxes[3].update(data)
+
+
 
 window.close()
 

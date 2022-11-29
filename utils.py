@@ -43,8 +43,6 @@ def nakladanie(img1, img2, rescale):
     img = (img1*rescale + img2*(1-rescale)).astype('uint8')
     return img
 
-
-
 def binarize(img, threshold=127):
     '''
     binarization
@@ -214,9 +212,40 @@ def dilate(cycles, img):
          img = img.filter(ImageFilter.MaxFilter(3))
     return img
 
+def convolution(img, kernel):
+    img = np.array(img)
+    img = grayscale(img)
+    h, w = img.shape[:2]
+    out = np.zeros((h, w), dtype='uint8')
+    
+    # (5x5) kernel, n_neigh = 2
+    n_neigh = kernel.shape[0]//2
+    # extended version of img for kernel processing (254x254) for kernel on outer areas
+    img_extnd = np.zeros((h+2*n_neigh, w+2*n_neigh), dtype=np.float16)
+    img_extnd[n_neigh:h+n_neigh, n_neigh:w+n_neigh] = img
+    # cropping type option?
+    
+    ## convolution
+    # iterating over image area in extended image version
+    rows, cols = img_extnd.shape
+    for i in range(n_neigh,rows-n_neigh):
+        for j in range(n_neigh, cols-n_neigh):
+            # convolution in ROI, sum of matched pixels multiplications
+            pixel_val = np.einsum('ij, ji',
+                                    img_extnd[i-n_neigh:i+n_neigh+1, j-n_neigh:j+n_neigh+1],
+                                    kernel)
+            # fixing potential overflow
+            pixel_val = 255 if pixel_val>255 else int(pixel_val)
+
+            out[i-n_neigh, j-n_neigh] = pixel_val
+    return out
 
 
 if __name__ == '__main__':
     np.random.seed(10)
     img = np.random.randint(0, 255, (50, 50, 3))
-    otsu(img)
+    #otsu(img)
+    ker = np.ones((3, 3))/9
+    xd = convolution(img, ker)
+    print(xd.shape)
+    
