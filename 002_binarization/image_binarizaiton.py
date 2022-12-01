@@ -9,12 +9,15 @@ current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 import utils
+from ImageLoader import ImageLoader
 
+
+loader = ImageLoader()
 # initial image
 img = np.zeros((400, 400, 3), 'uint8')
 img = Image.open('000_images/book_page.jpg').resize((400, 400))
 
-data = utils.img_to_bytes(img) 
+data = loader.img_to_bytes(img) 
 # gui composition
 # load image button
 file_browse1 = sg.FileBrowse("Choose file 1", key="Browse1", enable_events=True)
@@ -53,7 +56,7 @@ while True:
     # choosing file
     elif event == 'Browse1':
         filename = values['Browse1']
-        utils.load_image(filename, img_boxes[0], 400)
+        loader.load_image(filename, img_boxes[0], 400)
     # processing algorithm based on currently set option
     elif event == 'Process':
         if values['Combo'] == algorithms[0]:
@@ -75,7 +78,7 @@ while True:
         elif values['Combo'] == algorithms[5]:
             img_processed = utils.otsu(img)
         # update image field
-        data = utils.img_to_bytes(img_processed)
+        data = loader.img_to_bytes(img_processed)
         img_boxes[1].update(data = data)
     elif event == 'Save':
         img_save = Image.fromarray(img_processed)

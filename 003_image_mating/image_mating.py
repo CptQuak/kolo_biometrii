@@ -8,7 +8,10 @@ current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 import utils
+from ImageLoader import ImageLoader
 
+
+loader = ImageLoader()
 im_size = 300
 # initial image
 # gui composition
@@ -19,7 +22,7 @@ images_l = [Image.open(i).resize((im_size, im_size))
             ['000_images/dog.png', '000_images/beach.png', '000_images/thImg.jpg']]
 images_l.append(np.zeros((im_size, im_size, 3), 'uint8'))
 
-img_boxes = [sg.Image(data=utils.img_to_bytes(images_l[i-1]) , key=f"Image{i}") for i in range(1, 5)]
+img_boxes = [sg.Image(data=loader.img_to_bytes(images_l[i-1]) , key=f"Image{i}") for i in range(1, 5)]
 
 slider = sg.Slider(default_value=0, range=(0,30), orientation="horizontal", key='Slider')
 buttons = [sg.Button(i, key=i) for i in ['Dilate', 'Erode', 'Blur']]
@@ -31,8 +34,6 @@ layout = [
 ]
 # nowe okno: nazwa okna, układ kontrolek
 window = sg.Window("Simple Gui App", layout)
-
-
 
 # gui loop
 while True:
@@ -54,7 +55,7 @@ while True:
 
             new_img = utils.combine_img_mask(fg_img, th_img)
 
-            data = utils.img_to_bytes(th_img)
+            data = loader.img_to_bytes(th_img)
             img_boxes[2].update(data)
         
         elif event == 'Blur':
@@ -65,10 +66,8 @@ while True:
             # convolution
             new_img = utils.convolution(fg_img, kernel)
 
-        data = utils.img_to_bytes(new_img)
+        data = loader.img_to_bytes(new_img)
         img_boxes[3].update(data)
-
-
 
 window.close()
 

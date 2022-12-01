@@ -3,19 +3,6 @@ import PIL
 from PIL import Image, ImageFilter
 import io
 
-def img_to_bytes(img):
-    '''
-    img to bytes for viewing
-    '''
-    if isinstance(img, np.ndarray):
-        img = Image.fromarray(img)
-    img_byte_arr = io.BytesIO()
-    img.save(img_byte_arr, format='PNG')
-    return img_byte_arr.getvalue()
-
-
-
-
 def grayscale(img):
     '''
     rgb2gray using simple mean
@@ -24,24 +11,6 @@ def grayscale(img):
     out = img.mean(axis=2)
     out = out.astype('uint8')
     return out
-
-def load_image(file_path, target, im_size):
-    '''
-    Given img path, img window, reads, resizes, transforms to bytes and displays window
-    '''
-    img = Image.open(file_path).resize((im_size, im_size))
-    data = img_to_bytes(img)
-    target.update(data = data)
-    return img
-
-def nakladanie(img1, img2, rescale):
-    # funkcja w opencv
-    # img = cv2.addWeighted(img1, rescale, img2, 1-rescale, 0)
-    img1 = np.array(img1)
-    img2 = np.array(img2)
-    img = np.zeros(img1.shape, dtype='float16')
-    img = (img1*rescale + img2*(1-rescale)).astype('uint8')
-    return img
 
 def binarize(img, threshold=127):
     '''
@@ -187,6 +156,15 @@ def otsu(img):
     # selection of best
     best_th = np.argmin(war_within)    
     return binarize(img, best_th)
+
+def merging(img1, img2, rescale):
+    # funkcja w opencv
+    # img = cv2.addWeighted(img1, rescale, img2, 1-rescale, 0)
+    img1 = np.array(img1)
+    img2 = np.array(img2)
+    img = np.zeros(img1.shape, dtype='float16')
+    img = (img1*rescale + img2*(1-rescale)).astype('uint8')
+    return img
 
 
 def combine_img_mask(img, mask):
